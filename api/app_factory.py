@@ -14,7 +14,7 @@ def init_extensions(app: Flask):
 
 def create_app():
     start_time = time.perf_counter()
-    app = Flask("RaSa")
+    app = Flask("SaRa")
     app.config.from_mapping(app_config.model_dump())
     init_extensions(app)
     end_time = time.perf_counter()

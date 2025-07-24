@@ -1,7 +1,8 @@
 import os
 from urllib.parse import quote_plus
-from pydantic_settings import BaseSettings, SettingsConfigDict
-from pydantic import Field, NonNegativeInt, PositiveFloat, PositiveInt, computed_field
+
+from pydantic import Field, NonNegativeInt, PositiveInt, computed_field
+from pydantic_settings import BaseSettings
 
 
 class DatabaseConfig(BaseSettings):
@@ -27,7 +28,7 @@ class DatabaseConfig(BaseSettings):
 
     DB_DATABASE: str = Field(
         description="Name of the database to connect to.",
-        default="rasa",
+        default="sara",
     )
 
     DB_CHARSET: str = Field(
