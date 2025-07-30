@@ -4,11 +4,10 @@ import sqlalchemy as sa
 from sqlalchemy import func
 from sqlalchemy.orm import Mapped, mapped_column
 
-from .base import Base
 from .database import db
 
 
-class UploadFile(Base):
+class UploadFile(db.model):
     __tablename__ = "upload_files"
     __table_args__ = (
         db.PrimaryKeyConstraint("id", name="upload_file_pkey"),

@@ -44,8 +44,8 @@ config.set_main_option('sqlalchemy.url', get_engine_url())
 
 
 def get_metadata():
-    from models.base import Base
-    return Base.metadata
+    from models import metadata
+    return metadata
 
 
 def run_migrations_offline():
