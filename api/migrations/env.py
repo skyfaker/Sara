@@ -36,8 +36,6 @@ def get_engine_url():
 # from myapp import mymodel
 # target_metadata = mymodel.Base.metadata
 config.set_main_option('sqlalchemy.url', get_engine_url())
-target_db = current_app.extensions['migrate'].db
-
 
 # other values from the config, defined by the needs of env.py,
 # can be acquired:
@@ -46,9 +44,8 @@ target_db = current_app.extensions['migrate'].db
 
 
 def get_metadata():
-    if hasattr(target_db, 'metadatas'):
-        return target_db.metadatas[None]
-    return target_db.metadata
+    from models.base import Base
+    return Base.metadata
 
 
 def run_migrations_offline():

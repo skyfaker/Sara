@@ -1,5 +1,5 @@
 from sqlalchemy.orm import declarative_base
 
-from models.database import metadata
+from models import metadata
 
 Base = declarative_base(metadata=metadata)

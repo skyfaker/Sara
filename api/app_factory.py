@@ -7,8 +7,8 @@ from configs import app_config
 
 
 def init_extensions(app: Flask):
-    from extensions import __all__
-    for init_func in __all__:
+    from extensions import ext
+    for init_func in ext:
         init_func(app)
 
 
