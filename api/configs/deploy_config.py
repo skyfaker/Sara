@@ -1,11 +1,18 @@
 from pydantic import Field
-from pydantic_settings import BaseSettings
+from pydantic_settings import BaseSettings, SettingsConfigDict
 
 
 class DeploymentConfig(BaseSettings):
     """
     Configuration settings for application deployment
     """
+    model_config = SettingsConfigDict(
+        # read from dotenv format config file
+        env_file=".env",
+        env_file_encoding="utf-8",
+        # ignore extra attributes
+        extra="ignore",
+    )
 
     APPLICATION_NAME: str = Field(
         description="Name of the application, used for identification and logging purposes",
