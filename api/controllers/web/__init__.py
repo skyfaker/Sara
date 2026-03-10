@@ -3,7 +3,7 @@ web blueprint and web urls
 """
 from flask import Blueprint
 
-web_bp = Blueprint('web_api', __name__, url_prefix='/web_api')
+web_bp = Blueprint('web_api', __name__, url_prefix='/api')
 
 
 def add_resource():

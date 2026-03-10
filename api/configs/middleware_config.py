@@ -6,13 +6,6 @@ from pydantic_settings import BaseSettings, SettingsConfigDict
 
 
 class DatabaseConfig(BaseSettings):
-    model_config = SettingsConfigDict(
-        # read from dotenv format config file
-        env_file=".env",
-        env_file_encoding="utf-8",
-        # ignore extra attributes
-        extra="ignore",
-    )
     DB_HOST: str = Field(
         description="Hostname or IP address of the database server.",
         default="localhost",

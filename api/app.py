@@ -1,4 +1,8 @@
 import sys
+from configs import app_config
+
+if app_config.DEBUG:
+    app_config.LOG_LEVEL = "DEBUG"
 
 
 def is_db_command():
@@ -19,4 +23,5 @@ else:
 
 if __name__ == "__main__":
     # print("api_map: {}".format(app.url_map))
+
     app.run(host="0.0.0.0", port=5001)

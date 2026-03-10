@@ -15,7 +15,7 @@ class CompletionResponse(BaseModel):
     created: int
     model: str
     choices: list[CompletionField]
-    status: str = 200
+    status: int = 200
 
 
 class CompletionRawPydatic(Resource):
@@ -46,7 +46,6 @@ class Completion(Resource):
     @validate()
     def post(self, body: CompletionField):
         name = body.name
-        print(name)
         res = {
             "id": "cmpl-1234567890",
             "object": "text_completion",

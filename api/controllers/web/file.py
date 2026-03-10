@@ -1,5 +1,5 @@
 from flask import request
-
+import logging
 from flask_restx import Resource
 from pydantic import BaseModel, ValidationError, Field
 from flask_pydantic import validate
@@ -33,13 +33,23 @@ class UploadFile(Resource):
             upload_file = FileService.upload_file(
                 filename=filename,
                 content=file.read(),
-                user_id=user_id,
-                source=None,
+                user_id=user_id
             )
+            logging.info("Upload file: {} success".format(filename))
         except FileTooLargeError as e:
-            raise FileTooLargeError(e.message)
-        except UnsupportedFileTypeError:
-            raise UnsupportedFileTypeError()
+            logging.error('{}'.format(e))
+            response = {
+                "message": e.message,
+                "status": 201,
+            }
+            return UploadFileResponse(**response)
+        except UnsupportedFileTypeError as e:
+            logging.error('{}'.format(e))
+            response = {
+                "message": e.message,
+                "status": 201,
+            }
+            return UploadFileResponse(**response)
 
         response = {
             "message": "File uploaded successfully",

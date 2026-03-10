@@ -31,7 +31,7 @@ class LogConfig(BaseSettings):
 
     LOG_FORMAT: str = Field(
         description="Format string for log messages",
-        default="%(asctime)s.%(msecs)03d %(levelname)s [%(threadName)s] [%(filename)s:%(lineno)d] - %(message)s",
+        default="%(asctime)s.%(msecs)03d %(levelname)s [%(threadName)s-%(req_id)s] [%(filename)s:%(lineno)d] - %(message)s",
     )
 
     LOG_DATEFORMAT: Optional[str] = Field(

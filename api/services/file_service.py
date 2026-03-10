@@ -2,10 +2,11 @@ import datetime
 import hashlib
 import os
 import uuid
+import logging
 
 from configs import app_config
 from extensions.ext_db import db
-# from extensions.ext_storage import storage
+from extensions.ext_storage import storage
 from models.model import UploadFile
 
 
@@ -28,15 +29,13 @@ class FileService:
     def upload_file(*,
                     filename: str,
                     content: bytes,
-                    user_id,
-                    source=None):
+                    user_id):
         """
         Upload a file to the database.
 
         :param filename: Name of the file
         :param content: Content of the file as bytes
         :param user_id: User uploading the file
-        :param source: Optional source of the file
         :return: The uploaded file record
         """
         # check if filename contains invalid characters
@@ -54,29 +53,29 @@ class FileService:
         # get file size
         file_size = len(content)
         # check if the file size is exceeded
-        if file_size * 1024 * 1024 > app_config.FILE_SIZE_LIMIT:
+        if file_size > app_config.FILE_SIZE_LIMIT * 1024 * 1024:
             raise FileTooLargeError()
 
         # generate file key
         file_uuid = str(uuid.uuid4())
 
         # save file to storage
-        # file_key = "upload_files/" + file_uuid + "." + extension
-        # storage.save(file_key, content)
-        #
-        # # save file to db
-        # upload_file = UploadFile(
-        #     storage_type=app_config.STORAGE_TYPE,
-        #     key=file_key,
-        #     name=filename,
-        #     size=file_size,
-        #     extension=extension,
-        #     mime_type=mimetype,
-        #     created_by=user_id,
-        #     created_at=datetime.datetime.now(datetime.UTC).replace(tzinfo=None),
-        #     used=False,
-        #     hash=hashlib.sha3_256(content).hexdigest(),
-        # )
-        #
-        # db.session.add(upload_file)
-        # db.session.commit()
+        file_key = "upload_files/" + file_uuid + "." + extension
+        storage.save(file_key, content)
+        logging.debug("file {} saved to storage with key {}".format(filename, file_key))
+
+        # save file to db
+        upload_file = UploadFile(
+            storage_type=app_config.STORAGE_TYPE,
+            key=file_key,
+            name=filename,
+            size=file_size,
+            extension=extension,
+            created_by=user_id,
+            created_at=datetime.datetime.now(datetime.UTC).replace(tzinfo=None),
+            used=False,
+            hash=hashlib.sha3_256(content).hexdigest(),
+        )
+
+        db.session.add(upload_file)
+        db.session.commit()

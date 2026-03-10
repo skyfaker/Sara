@@ -8,7 +8,7 @@ import flask
 from configs import app_config
 
 
-def init_logging(app):
+def init_logging(app: flask.Flask):
     log_handlers: list[logging.Handler] = []
     log_file = app_config.LOG_FILE
     if log_file:
