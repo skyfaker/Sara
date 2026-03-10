@@ -13,4 +13,10 @@ dependencies = [
     "pydantic-settings~=2.6.0",
     "flask-cors~=4.0.0",
     "flask-migrate~=4.0.7",
+    "litellm>=1.0.0",
+]
+
+[dependency-groups]
+dev = [
+    "pytest>=9.0.2",
 ]

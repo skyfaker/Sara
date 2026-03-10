@@ -1,9 +1,10 @@
 """
 web blueprint and web urls
 """
+
 from flask import Blueprint
 
-web_bp = Blueprint('web_api', __name__, url_prefix='/api')
+web_bp = Blueprint("web_api", __name__, url_prefix="/api")
 
 
 def add_resource():
@@ -12,13 +13,13 @@ def add_resource():
     """
     from flask_restx import Api
     from .hello import HelloWorld
-    from .completion import Completion
+    from .completion import Chat
     from .file import UploadFile
 
     web_api = Api(web_bp)
-    web_api.add_resource(HelloWorld, '/hello')
-    web_api.add_resource(Completion, '/completion')
-    web_api.add_resource(UploadFile, '/upload_file')
+    web_api.add_resource(HelloWorld, "/hello")
+    web_api.add_resource(Chat, "/chat")
+    web_api.add_resource(UploadFile, "/upload_file")
 
 
 add_resource()
