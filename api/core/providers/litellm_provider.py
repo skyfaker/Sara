@@ -4,6 +4,7 @@ import json
 import os
 from typing import Any
 
+from loguru import logger
 import litellm
 from litellm import acompletion
 
@@ -120,6 +121,7 @@ class LiteLLMProvider(LLMProvider):
             LLMResponse with content and/or tool calls.
         """
         model = self._resolve_model(model or self.default_model)
+        logger.info(f"LiteLLMProvider.chat called with model: {model}")
 
         kwargs: dict[str, Any] = {
             "model": model,

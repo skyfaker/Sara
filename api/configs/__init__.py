@@ -2,12 +2,14 @@ from pydantic_settings import SettingsConfigDict
 
 from .deploy_config import DeploymentConfig
 from .file_config import FileConfig
+from .llm_config import LlmConfig
 from .log_config import LogConfig
 from .middleware_config import MiddlewareConfig
 
 
 class AppConfig(DeploymentConfig,
                 FileConfig,
+                LlmConfig,
                 LogConfig,
                 MiddlewareConfig):
     model_config = SettingsConfigDict(

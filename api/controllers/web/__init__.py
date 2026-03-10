@@ -13,7 +13,7 @@ def add_resource():
     """
     from flask_restx import Api
     from .hello import HelloWorld
-    from .completion import Chat
+    from .chat import Chat
     from .file import UploadFile
 
     web_api = Api(web_bp)
