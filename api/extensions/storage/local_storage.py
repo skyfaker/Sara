@@ -17,6 +17,10 @@ class LocalStorage(BaseStorage):
         if self.exists(filename):
             raise FileExistsError(f"File {filename} already exists in local storage.")
         file_path = os.path.join(self.root, filename)
+        
+        # Ensure subdirectories exist
+        os.makedirs(os.path.dirname(file_path), exist_ok=True)
+        
         with open(file_path, 'wb') as file:
             file.write(data)
 

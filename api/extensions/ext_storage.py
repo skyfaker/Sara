@@ -16,6 +16,7 @@ class Storage:
         match storage_type:
             case StorageType.LOCAL:
                 from extensions.storage.local_storage import LocalStorage
+
                 return LocalStorage
             case _:
                 raise ValueError(f"unsupported storage type {storage_type}")
@@ -29,7 +30,7 @@ class Storage:
         self.storage_runner.save(filename, data)
 
     def load(self, filename: str):
-        return self.load(filename)
+        return self.storage_runner.load(filename)
 
     def download(self, filename, target_filepath):
         self.storage_runner.download(filename, target_filepath)
