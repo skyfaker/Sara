@@ -1,3 +1,4 @@
+import asyncio
 import logging
 from typing import Optional
 
@@ -32,9 +33,22 @@ class Chat(Resource):
         messages = [m.model_dump() for m in body.messages]
 
         if body.stream:
-            generator = ChatService.chat_stream(messages, model=body.model)
+            def sync_stream_wrapper():
+                loop = asyncio.new_event_loop()
+                asyncio.set_event_loop(loop)
+                try:
+                    async_gen = ChatService.chat_stream(messages, model=body.model)
+                    while True:
+                        try:
+                            chunk = loop.run_until_complete(async_gen.__anext__())
+                            yield chunk
+                        except StopAsyncIteration:
+                            break
+                finally:
+                    loop.close()
+
             return Response(
-                stream_with_context(generator),
+                stream_with_context(sync_stream_wrapper()),
                 mimetype="text/event-stream",
                 headers={
                     "Cache-Control": "no-cache",
@@ -43,7 +57,7 @@ class Chat(Resource):
             )
 
         try:
-            content = ChatService.chat(messages, model=body.model)
+            content = asyncio.run(ChatService.chat(messages, model=body.model))
         except Exception as exc:
             logging.error("Chat error: %s", exc)
             return {"status": 500, "message": str(exc)}, 500

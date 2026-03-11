@@ -1,7 +1,6 @@
-import asyncio
 import json
 import logging
-from collections.abc import Generator
+from collections.abc import AsyncGenerator
 from typing import Any
 
 from litellm import acompletion
@@ -20,23 +19,21 @@ class ChatService:
         )
 
     @staticmethod
-    def chat(messages: list[dict[str, Any]], model: str | None = None) -> str:
+    async def chat(messages: list[dict[str, Any]], model: str | None = None) -> str:
         provider = ChatService._build_provider()
-        response = asyncio.run(
-            provider.chat(
-                messages=messages,
-                model=model or app_config.LLM_DEFAULT_MODEL,
-                max_tokens=app_config.LLM_MAX_TOKENS,
-                temperature=app_config.LLM_TEMPERATURE,
-            )
+        response = await provider.chat(
+            messages=messages,
+            model=model or app_config.LLM_DEFAULT_MODEL,
+            max_tokens=app_config.LLM_MAX_TOKENS,
+            temperature=app_config.LLM_TEMPERATURE,
         )
         return response.content or ""
 
     @staticmethod
-    def chat_stream(
+    async def chat_stream(
         messages: list[dict[str, Any]],
         model: str | None = None,
-    ) -> Generator[str, None, None]:
+    ) -> AsyncGenerator[str, None]:
         provider = ChatService._build_provider()
         resolved_model = provider._resolve_model(model or app_config.LLM_DEFAULT_MODEL)
 
@@ -52,22 +49,17 @@ class ChatService:
         if provider.extra_headers:
             kwargs["extra_headers"] = provider.extra_headers
 
-        async def _collect_chunks() -> list[str]:
-            chunks: list[str] = []
-            try:
-                stream = await acompletion(**kwargs)
-                async for chunk in stream:
-                    if chunk.choices and chunk.choices[0].delta:
-                        delta = chunk.choices[0].delta
-                        if delta.content:
-                            chunks.append(delta.content)
-            except Exception as exc:
-                logging.error("LLM stream error: %s", exc)
-                chunks.append(f"[ERROR] {exc}")
-            return chunks
-
-        for text_chunk in asyncio.run(_collect_chunks()):
-            data = json.dumps({"content": text_chunk, "done": False})
-            yield f"data: {data}\n\n"
+        try:
+            stream = await acompletion(**kwargs)
+            async for chunk in stream:
+                if chunk.choices and chunk.choices[0].delta:
+                    delta = chunk.choices[0].delta
+                    if delta.content:
+                        data = json.dumps({"content": delta.content, "done": False})
+                        yield f"data: {data}\n\n"
+        except Exception as exc:
+            logging.error("LLM stream error: %s", exc)
+            error_data = json.dumps({"content": f"[ERROR] {exc}", "done": False})
+            yield f"data: {error_data}\n\n"
 
         yield f"data: {json.dumps({'content': '', 'done': True})}\n\n"
