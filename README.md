@@ -1,4 +1,4 @@
-# SaRa - RAG Knowledge Base Q&A System
+# SaRa - Super agent with rag
 
 An intelligent document Q&A system built on Flask + LLM, supporting DOCX document upload, smart indexing, and retrieval-augmented generation (RAG) based question answering.
 
