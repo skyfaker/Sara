@@ -1,154 +1,154 @@
-# SaRa - RAG知识库问答系统
+# SaRa - RAG Knowledge Base Q&A System
 
-一个基于Flask + LLM的智能文档问答系统，支持DOCX文档上传、智能索引和基于检索增强生成(RAG)的问答。
+An intelligent document Q&A system built on Flask + LLM, supporting DOCX document upload, smart indexing, and retrieval-augmented generation (RAG) based question answering.
 
-## 项目结构
+## Project Structure
 
 ```
 sara/api/
-├── app_factory.py                          # Flask应用工厂
-├── app.py                                  # 应用入口
-├── .env                                    # 环境配置
-├── pyproject.toml                          # 项目依赖配置
-├── uv.lock                                 # 依赖锁定文件
+├── app_factory.py                          # Flask application factory
+├── app.py                                  # Application entry point
+├── .env                                    # Environment configuration
+├── pyproject.toml                          # Project dependency config
+├── uv.lock                                 # Dependency lock file
 │
-├── configs/                                # 配置模块
+├── configs/                                # Configuration module
 │   ├── __init__.py
-│   ├── deploy_config.py                    # 部署配置
-│   ├── file_config.py                      # 文件上传配置
-│   ├── llm_config.py                       # LLM配置
-│   ├── log_config.py                       # 日志配置
-│   └── middleware_config.py                # 中间件配置
+│   ├── deploy_config.py                    # Deployment config
+│   ├── file_config.py                      # File upload config
+│   ├── llm_config.py                       # LLM config
+│   ├── log_config.py                       # Logging config
+│   └── middleware_config.py                # Middleware config
 │
-├── controllers/                            # 控制器层
-│   ├── cli/                                # CLI命令行工具
+├── controllers/                            # Controller layer
+│   ├── cli/                                # CLI tools
 │   │   ├── __init__.py
-│   │   ├── command.py                      # CLI入口 (统一app定义)
-│   │   ├── chat.py                         # 聊天命令函数 (chat/chat_once)
-│   │   ├── file.py                         # 文件上传命令函数 (upload)
-│   │   └── rag.py                          # RAG查询命令函数 (query/ask)
-│   └── web/                                # Web API接口
+│   │   ├── command.py                      # CLI entry point (single app definition)
+│   │   ├── chat.py                         # Chat command functions (chat/chat_once)
+│   │   ├── file.py                         # File upload command functions (upload)
+│   │   └── rag.py                          # RAG query command functions (query/ask)
+│   └── web/                                # Web API controllers
 │       ├── __init__.py
-│       ├── chat.py                         # 聊天REST接口
-│       ├── file.py                         # 文件上传REST接口
-│       ├── rag.py                          # RAG查询REST接口
-│       └── hello.py                        # Hello World示例
+│       ├── chat.py                         # Chat REST endpoints
+│       ├── file.py                         # File upload REST endpoints
+│       ├── rag.py                          # RAG query REST endpoints
+│       └── hello.py                        # Hello World example
 │
-├── core/                                   # 核心功能模块
-│   ├── providers/                          # LLM提供商抽象层
+├── core/                                   # Core modules
+│   ├── providers/                          # LLM provider abstraction
 │   │   ├── __init__.py
-│   │   ├── base.py                         # 基础Provider接口
-│   │   ├── litellm_provider.py             # LiteLLM实现
-│   │   └── registry.py                     # Provider注册中心
-│   └── rag/                                # RAG核心功能
-│       ├── file_loader/                    # 文档加载器
+│   │   ├── base.py                         # Base provider interface
+│   │   ├── litellm_provider.py             # LiteLLM implementation
+│   │   └── registry.py                     # Provider registry
+│   └── rag/                                # RAG core
+│       ├── file_loader/                    # Document loaders
 │       │   ├── __init__.py
-│       │   ├── base.py                     # 加载器基类
-│       │   └── docling_loader.py           # Docling DOCX加载器
-│       ├── file_indexer.py                 # LLM索引器 (生成description+content)
-│       └── retriever.py                    # 智能检索器 (两阶段检索)
+│       │   ├── base.py                     # Loader base class
+│       │   └── docling_loader.py           # Docling DOCX loader
+│       ├── file_indexer.py                 # LLM indexer (generates description + content)
+│       └── retriever.py                    # Smart retriever (two-stage retrieval)
 │
-├── extensions/                             # Flask扩展
+├── extensions/                             # Flask extensions
 │   ├── __init__.py
-│   ├── ext_blueprints.py                   # Blueprint注册
-│   ├── ext_db.py                           # 数据库扩展
-│   ├── ext_logging.py                      # 日志扩展
-│   ├── ext_migrate.py                      # 数据库迁移扩展
-│   ├── ext_storage.py                      # 存储扩展
+│   ├── ext_blueprints.py                   # Blueprint registration
+│   ├── ext_db.py                           # Database extension
+│   ├── ext_logging.py                      # Logging extension
+│   ├── ext_migrate.py                      # Database migration extension
+│   ├── ext_storage.py                      # Storage extension
 │   └── storage/
-│       ├── base_storage.py                 # 存储基类
-│       └── local_storage.py                # 本地文件存储实现
+│       ├── base_storage.py                 # Storage base class
+│       └── local_storage.py                # Local file storage implementation
 │
-├── migrations/                             # 数据库迁移
+├── migrations/                             # Database migrations
 │   ├── alembic.ini
 │   ├── env.py
 │   ├── script.py.mako
 │   └── versions/
-│       └── *.py                            # 迁移脚本
+│       └── *.py                            # Migration scripts
 │
-├── models/                                 # 数据库模型
+├── models/                                 # Database models
 │   ├── __init__.py
-│   ├── database.py                         # 数据库连接
-│   └── model.py                            # ORM模型定义
+│   ├── database.py                         # Database connection
+│   └── model.py                            # ORM model definitions
 │
-├── services/                               # 业务逻辑层
-│   ├── chat_service.py                     # 聊天服务 (异步LLM调用)
-│   └── file_service.py                     # 文件服务 (上传/验证)
+├── services/                               # Business logic layer
+│   ├── chat_service.py                     # Chat service (async LLM calls)
+│   └── file_service.py                     # File service (upload/validation)
 │
-├── storage/                                # 文件存储目录
-│   ├── upload_files/                       # 用户上传的原始文件
-│   └── index_files/                        # LLM生成的markdown索引文件
+├── storage/                                # File storage directory
+│   ├── upload_files/                       # Raw uploaded files
+│   └── index_files/                        # LLM-generated markdown index files
 │
-└── tests/                                  # 测试套件
-    ├── test_chat_service.py                # 聊天服务测试 (8个)
-    ├── test_docling_loader.py              # 文档加载器测试 (4个)
-    ├── test_file_indexer.py                # 索引器测试 (7个)
-    ├── test_file_service.py                # 文件服务测试 (4个)
-    ├── test_rag_integration.py             # RAG集成测试 (6个)
-    ├── test_retriever.py                   # 检索器测试 (13个)
+└── tests/                                  # Test suite
+    ├── test_chat_service.py                # Chat service tests (8)
+    ├── test_docling_loader.py              # Document loader tests (4)
+    ├── test_file_indexer.py                # Indexer tests (7)
+    ├── test_file_service.py                # File service tests (4)
+    ├── test_rag_integration.py             # RAG integration tests (6)
+    ├── test_retriever.py                   # Retriever tests (13)
     └── test_data/
-        ├── doc1.docx                       # 测试文档
-        └── test_save.txt                   # 测试文本
+        ├── doc1.docx                       # Test document
+        └── test_save.txt                   # Test text file
 ```
 
-## 快速开始
+## Quick Start
 
-### 环境要求
+### Requirements
 
 - Python 3.11+
-- uv (依赖管理工具)
+- uv (dependency manager)
 
-### 安装依赖
+### Install Dependencies
 
 ```bash
 cd api
 uv sync
 ```
 
-### 运行Web服务
+### Run the Web Server
 
 ```bash
 cd api
 uv run python app.py
 ```
 
-服务将运行在 `http://localhost:5001`
+The server runs at `http://localhost:5001`.
 
-## CLI工具使用指南
+## CLI Usage
 
-> 前提：已在 `api/` 目录下完成安装。
+> **Prerequisite:** Install the package from the `api/` directory:
 > ```bash
 > cd api && uv pip install --python .venv/bin/python -e .
 > ```
-> 之后可直接使用 `sara` 命令（需激活 `.venv`），或通过 `.venv/bin/sara` 调用。
+> Then use `sara` directly (with `.venv` activated) or via `.venv/bin/sara`.
 
-### 命令总览
+### Command Overview
 
 ```
-sara chat        交互式LLM聊天
-sara chat_once   单次LLM问答
-sara upload      上传并索引DOCX文件
-sara query       交互式RAG问答
-sara ask         单次RAG问答
+sara chat        Start an interactive LLM chat session
+sara chat_once   Send a single message to the LLM
+sara upload      Upload and index a DOCX file
+sara query       Start an interactive RAG Q&A session
+sara ask         Ask a single question via RAG
 ```
 
 ---
 
-### 1. `sara chat` — 交互式聊天
+### 1. `sara chat` — Interactive Chat
 
 ```bash
 sara chat [--model MODEL] [--stream/--no-stream]
 ```
 
-**选项**:
-- `--model, -m`: 指定LLM模型 (可选，默认使用配置中的 `LLM_DEFAULT_MODEL`)
-- `--stream/--no-stream`: 启用/禁用流式输出 (默认启用)
+**Options:**
+- `--model, -m`: LLM model to use (optional, defaults to `LLM_DEFAULT_MODEL` in config)
+- `--stream/--no-stream`: Enable/disable streaming output (default: enabled)
 
-**交互命令**:
-- `exit`, `quit`: 退出会话
-- `clear`: 清除对话历史
+**Session commands:**
+- `exit`, `quit`: End the session
+- `clear`: Clear conversation history
 
-**示例**:
+**Examples:**
 ```bash
 sara chat
 sara chat --model gpt-4
@@ -157,48 +157,48 @@ sara chat --no-stream
 
 ---
 
-### 2. `sara chat_once` — 单次问答
+### 2. `sara chat_once` — Single-turn Chat
 
 ```bash
-sara chat_once "你的问题" [--model MODEL] [--stream/--no-stream]
+sara chat_once "your message" [--model MODEL] [--stream/--no-stream]
 ```
 
-**选项**:
-- `--model, -m`: 指定LLM模型 (可选)
-- `--stream/--no-stream`: 启用/禁用流式输出 (默认禁用)
+**Options:**
+- `--model, -m`: LLM model to use (optional)
+- `--stream/--no-stream`: Enable/disable streaming output (default: disabled)
 
-**示例**:
+**Examples:**
 ```bash
-sara chat_once "什么是RAG?"
-sara chat_once "解释一下向量数据库" --model gpt-4
-sara chat_once "写一段Python代码" --stream
+sara chat_once "What is RAG?"
+sara chat_once "Explain vector databases" --model gpt-4
+sara chat_once "Write a Python function" --stream
 ```
 
 ---
 
-### 3. `sara upload` — 文件上传并索引
+### 3. `sara upload` — Upload and Index a Document
 
 ```bash
-sara upload <docx文件路径> [--user-id USER_ID]
+sara upload <path-to-docx> [--user-id USER_ID]
 ```
 
-**功能**:
-1. 验证文件格式 (仅支持 `.docx`)
-2. 上传文件到存储
-3. 自动使用 Docling 加载文档内容
-4. 自动调用 LLM 重组内容并生成 markdown 索引
-5. 保存索引到 `storage/index_files/{file_uuid}.md`
+**What it does:**
+1. Validates file format (`.docx` only)
+2. Uploads the file to storage
+3. Loads document content via Docling
+4. Calls LLM to restructure content and generate a markdown index
+5. Saves the index to `storage/index_files/{file_uuid}.md`
 
-**选项**:
-- `--user-id, -u`: 指定用户ID (默认: `cli_user`)
+**Options:**
+- `--user-id, -u`: User ID for the upload (default: `cli_user`)
 
-**示例**:
+**Examples:**
 ```bash
 sara upload tests/test_data/doc1.docx
 sara upload document.docx --user-id user123
 ```
 
-**输出示例**:
+**Sample output:**
 ```
 ╭─────────────────╮
 │ Uploading File  │
@@ -222,28 +222,28 @@ Index saved to: /path/to/storage/index_files/06faac32-...md
 
 ---
 
-### 4. `sara query` — 交互式RAG问答
+### 4. `sara query` — Interactive RAG Q&A
 
 ```bash
 sara query [--top-k N] [--model MODEL]
 ```
 
-**选项**:
-- `--top-k, -k`: 检索文档数量 (默认: 3)
-- `--model, -m`: 指定LLM模型 (可选)
+**Options:**
+- `--top-k, -k`: Number of documents to retrieve (default: 3)
+- `--model, -m`: LLM model to use (optional)
 
-**交互命令**:
-- `exit`, `quit`: 退出会话
-- `sources`: 显示上次检索的来源文档
+**Session commands:**
+- `exit`, `quit`: End the session
+- `sources`: Show sources from the last retrieval
 
-**示例**:
+**Examples:**
 ```bash
 sara query
 sara query --top-k 5
 sara query --model gpt-4 --top-k 3
 ```
 
-**交互示例**:
+**Sample session:**
 ```
 ╭────────────────────────────────────╮
 │ SaRa RAG Query                     │
@@ -251,7 +251,7 @@ sara query --model gpt-4 --top-k 3
 │ Top-K: 3                           │
 ╰────────────────────────────────────╯
 
-Question: 这个文档讲的是什么？
+Question: What is this document about?
 
         Retrieved Sources
 ┏━━━━━━━━━━━━━┳━━━━━━━━━━━━━━━━━┓
@@ -261,7 +261,7 @@ Question: 这个文档讲的是什么？
 └─────────────┴─────────────────┘
 
 Answer:
-这个文档是《中华人民共和国治安管理处罚法》的文本内容...
+This document contains the text of ...
 
 Question: exit
 Goodbye!
@@ -269,76 +269,70 @@ Goodbye!
 
 ---
 
-### 5. `sara ask` — 单次RAG问答
+### 5. `sara ask` — Single-turn RAG Query
 
 ```bash
-sara ask "你的问题" [--top-k N] [--model MODEL] [--show-sources]
+sara ask "your question" [--top-k N] [--model MODEL] [--show-sources]
 ```
 
-**选项**:
-- `--top-k, -k`: 检索文档数量 (默认: 3)
-- `--model, -m`: 指定LLM模型 (可选)
-- `--show-sources, -s`: 显示来源文档
+**Options:**
+- `--top-k, -k`: Number of documents to retrieve (default: 3)
+- `--model, -m`: LLM model to use (optional)
+- `--show-sources, -s`: Display source documents
 
-**示例**:
+**Examples:**
 ```bash
-sara ask "这个法律规定了什么处罚原则?"
-sara ask "什么是治安管理?" --show-sources
-sara ask "处罚流程是怎样的?" --top-k 5 --show-sources
+sara ask "What penalties does this law define?"
+sara ask "What is public order management?" --show-sources
+sara ask "Describe the enforcement process" --top-k 5 --show-sources
 ```
 
-**交互示例**
+**Sample output:**
 ```
-> sara ask "治安管理工作有哪个部门负责"
->
-2026-03-12 18:34:08.930 | INFO     | core.rag.retriever:retrieve:74 - Retrieving documents for query: 治安管理工作有那个部门负责...
-2026-03-12 18:34:08.930 | INFO     | core.rag.retriever:retrieve:82 - Found 1 indexed documents
-2026-03-12 18:34:08.931 | INFO     | core.providers.litellm_provider:chat:124 - LiteLLMProvider.chat called with model: hosted_vllm/MiniMax-M2.5
-⠙ Retrieving documents...2026-03-12 18:34:13.211 | INFO     | core.rag.retriever:retrieve:91 - Found 1 relevant documents above threshold 0.6
-2026-03-12 18:34:13.211 | INFO     | core.rag.retriever:retrieve:107 - Retrieved 1 document chunks
-2026-03-12 18:34:13.213 | INFO     | core.providers.litellm_provider:chat:124 - LiteLLMProvider.chat called with model: hosted_vllm/MiniMax-M2.5
+$ sara ask "Which department is responsible for public order management?"
+
 根据文档内容，治安管理工作的主管部门如下：
 第七条　主管部门
 • 全国范围：国务院公安部门负责全国的治安管理工作
- • 地方范围：县级以上地方各级人民政府公安机关负责本行政区域内的治安管理工作
- 此外，治安案件的管辖由国务院公安部门规定。
+• 地方范围：县级以上地方各级人民政府公安机关负责本行政区域内的治安管理工作
 ```
+
 ---
 
-## Web API接口
+## Web API
 
-### 1. 聊天接口
+### 1. Chat
 
-**端点**: `POST /api/chat`
+**Endpoint:** `POST /api/chat`
 
-**请求体**:
+**Request body:**
 ```json
 {
   "messages": [
-    {"role": "user", "content": "你好"}
+    {"role": "user", "content": "Hello"}
   ],
   "model": "gpt-4"
 }
 ```
 
-**响应**:
+**Response:**
 ```json
 {
-  "response": "你好！我是AI助手，有什么可以帮助你的吗？",
+  "response": "Hello! I'm an AI assistant. How can I help you?",
   "status": 200
 }
 ```
 
 ---
 
-### 2. 文件上传接口
+### 2. File Upload
 
-**端点**: `POST /api/upload_file`
+**Endpoint:** `POST /api/upload_file`
 
-**请求体**: multipart/form-data
-- `file`: 上传的DOCX文件
+**Request body:** `multipart/form-data`
+- `file`: The DOCX file to upload
 
-**响应**:
+**Response:**
 ```json
 {
   "file_uuid": "06faac32-5845-4416-9db2-769c27ace596",
@@ -351,23 +345,23 @@ sara ask "处罚流程是怎样的?" --top-k 5 --show-sources
 
 ---
 
-### 3. RAG查询接口
+### 3. RAG Query
 
-**端点**: `POST /api/rag/query`
+**Endpoint:** `POST /api/rag/query`
 
-**请求体**:
+**Request body:**
 ```json
 {
-  "query": "这个文档讲的是什么?",
+  "query": "What is this document about?",
   "top_k": 3,
   "model": "gpt-4"
 }
 ```
 
-**响应**:
+**Response:**
 ```json
 {
-  "answer": "这个文档是《中华人民共和国治安管理处罚法》...",
+  "answer": "This document contains ...",
   "sources": [
     {
       "source_file": "doc1.docx",
@@ -380,219 +374,183 @@ sara ask "处罚流程是怎样的?" --top-k 5 --show-sources
 
 ---
 
-## RAG工作流程
+## RAG Pipeline
 
-### 1. 文档上传与索引
+### 1. Document Upload and Indexing
 
 ```
-用户上传DOCX → FileService验证 → LocalStorage保存
-                                      ↓
-                                DoclingLoader加载
-                                      ↓
-                          FileIndexer处理 (LLM)
-                          ├─ 生成description (摘要)
-                          └─ 重组content (结构化)
-                                      ↓
-                          保存markdown索引文件
+User uploads DOCX → FileService validates → LocalStorage saves
+                                                  ↓
+                                           DoclingLoader loads
+                                                  ↓
+                                        FileIndexer processes (LLM)
+                                        ├─ Generates description (summary)
+                                        └─ Restructures content
+                                                  ↓
+                                        Saves markdown index file
 ```
 
-**索引文件格式** (`storage/index_files/{file_uuid}.md`):
+**Index file format** (`storage/index_files/{file_uuid}.md`):
 ```markdown
 ---
-description: LLM生成的文档摘要 (100-200字)
+description: LLM-generated document summary (100–200 words)
 source_file: doc1.docx
 ---
 
 # Content
 
-LLM重新组织的结构化内容，保留段落层级关系
+LLM-restructured content preserving section hierarchy
 ```
 
-### 2. 智能检索与问答
+### 2. Retrieval and Answer Generation
 
 ```
-用户提问 → Retriever两阶段检索
-            ├─ 阶段1: 扫描所有markdown的description
-            ├─ 阶段2: LLM对description评分 (0-1)
-            ├─ 阶段3: 筛选高于阈值(0.6)的文档
-            └─ 阶段4: 加载完整content
-                        ↓
-                    构建上下文
-                        ↓
-                    ChatService生成答案
-                        ↓
-                    返回答案+来源
+User question → Retriever two-stage retrieval
+                ├─ Stage 1: Scan descriptions of all indexed markdown files
+                ├─ Stage 2: LLM scores each description (0–1)
+                ├─ Stage 3: Filter documents above threshold (0.6)
+                └─ Stage 4: Load full content of selected documents
+                                  ↓
+                           Build context
+                                  ↓
+                           ChatService generates answer
+                                  ↓
+                           Return answer + sources
 ```
 
-**检索策略优势**:
-- **高效**: 先用轻量级description快速筛选，避免加载所有文档
-- **精准**: LLM评分确保语义相关性
-- **可解释**: 返回相关性评分和来源文档
+**Why this works well:**
+- **Efficient**: Lightweight description scanning avoids loading all documents upfront
+- **Accurate**: LLM scoring ensures semantic relevance
+- **Explainable**: Relevance scores and source files are returned with every answer
 
 ---
 
-## 测试
+## Testing
 
-### 运行所有测试
+### Run all tests
 ```bash
 cd api
 uv run pytest tests/ -v
 ```
 
-### 运行特定测试
+### Run a specific test file
 ```bash
-# 测试RAG检索器
 uv run pytest tests/test_retriever.py -v
-
-# 测试RAG集成
 uv run pytest tests/test_rag_integration.py -v
-
-# 测试文件索引
 uv run pytest tests/test_file_indexer.py -v
 ```
 
-### 测试覆盖率
+### Test coverage
 
-| 测试模块 | 测试数量 | 状态 |
-|---------|---------|------|
+| Module | Tests | Status |
+|--------|-------|--------|
 | test_chat_service.py | 8 | ✅ |
 | test_docling_loader.py | 4 | ✅ |
 | test_file_indexer.py | 7 | ✅ |
 | test_file_service.py | 4 | ✅ |
 | test_rag_integration.py | 6 | ✅ |
 | test_retriever.py | 13 | ✅ |
-| **总计** | **44** | **✅** |
+| **Total** | **44** | **✅** |
 
 ---
 
-## 配置说明
+## Configuration
 
-### 环境变量 (`.env`)
+### Environment Variables (`.env`)
 
 ```bash
-# LLM配置
+# LLM
 LLM_API_KEY=your-api-key
 LLM_API_BASE=https://api.openai.com/v1
 LLM_DEFAULT_MODEL=gpt-4
 LLM_MAX_TOKENS=4096
 LLM_TEMPERATURE=0.7
 
-# 文件配置
+# File upload
 FILE_SIZE_LIMIT=50
 FILE_EXTENSIONS=txt,docx,pdf
 
-# 存储配置
+# Storage
 STORAGE_TYPE=local
 LOCAL_STORAGE_PATH=./storage
 ```
 
-### 支持的文件格式
+### Supported File Formats
 
-当前版本支持:
-- ✅ `.docx` (Microsoft Word文档)
+Currently supported:
+- ✅ `.docx` (Microsoft Word)
 
-计划支持:
-- 🔄 `.pdf` (PDF文档)
-- 🔄 `.txt` (纯文本)
-
----
-
-## 核心技术
-
-- **Web框架**: Flask + Flask-RESTX
-- **异步处理**: asyncio + async/await
-- **LLM集成**: LiteLLM (支持多种模型)
-- **文档解析**: Docling (IBM开源)
-- **CLI框架**: Typer + Rich (精美终端UI)
-- **数据验证**: Pydantic
-- **测试框架**: Pytest
-- **依赖管理**: uv
+Planned:
+- 🔄 `.pdf`
+- 🔄 `.txt`
 
 ---
 
-## 开发指南
+## Tech Stack
 
-### 代码规范
+- **Web framework**: Flask + Flask-RESTX
+- **Async**: asyncio + async/await
+- **LLM integration**: LiteLLM (multi-model support)
+- **Document parsing**: Docling (IBM open source)
+- **CLI**: Typer + Rich
+- **Validation**: Pydantic
+- **Testing**: Pytest
+- **Dependency management**: uv
 
-- 使用 `ruff` 进行代码检查和格式化
-- 所有函数必须有类型注解
-- 控制器层薄化，业务逻辑在服务层
-- 遵循Clean Architecture原则
+---
 
-### 运行代码检查
+## Development
+
+### Code Style
+
+- `ruff` for linting and formatting
+- Type hints required on all functions
+- Thin controllers — business logic belongs in services
+- Clean Architecture principles
+
+### Linting
 
 ```bash
 cd api
-
-# 检查代码
 uv run ruff check .
-
-# 自动修复
 uv run ruff check --fix .
-
-# 格式化代码
 uv run ruff format .
 ```
 
-### 数据库迁移
+### Database Migrations
 
 ```bash
 cd api
-
-# 生成迁移
-uv run flask db migrate -m "描述"
-
-# 应用迁移
+uv run flask db migrate -m "description"
 uv run flask db upgrade
 ```
 
 ---
 
-## 项目特性
+## Features
 
-### ✨ 核心特性
+### ✨ Core
 
-1. **智能文档索引**
-   - LLM自动生成文档摘要
-   - 保留原文结构和层级关系
-   - 支持增量索引
+1. **Smart document indexing** — LLM-generated summaries with preserved document structure
+2. **Two-stage retrieval** — Fast description filtering + full content loading with LLM relevance scoring
+3. **Multiple interfaces** — Interactive CLI sessions, single-shot CLI commands, REST API
+4. **Rich terminal UI** — Tables, panels, Markdown rendering, and live progress via Rich
 
-2. **两阶段检索**
-   - 快速描述筛选 + 完整内容加载
-   - LLM语义相关性评分
-   - 可配置相关性阈值
+### 🔒 Security
 
-3. **多种交互方式**
-   - CLI交互式会话
-   - CLI单次查询
-   - REST API接口
-
-4. **精美终端UI**
-   - Rich库驱动的表格、面板、Markdown渲染
-   - 实时进度显示
-   - 彩色输出和图标
-
-### 🔒 安全特性
-
-- 文件类型验证
-- 文件大小限制
-- 文件名非法字符检查
-- 存储路径隔离
+- File type validation
+- File size limits
+- Filename sanitization
+- Isolated storage paths
 
 ---
 
-## 许可证
+## License
 
 MIT License
 
 ---
 
-## 贡献
+## Contributing
 
-欢迎提交Issue和Pull Request！
-
----
-
-## 联系方式
-
-如有问题或建议，请提交Issue。
+Issues and pull requests are welcome.
