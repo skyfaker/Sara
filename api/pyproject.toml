@@ -20,6 +20,12 @@ dependencies = [
     "transformers>=5.3.0",
 ]
 
+[project.scripts]
+sara = "controllers.cli.command:app"
+
+[tool.setuptools]
+packages = ["controllers", "controllers.cli", "controllers.web", "core", "core.providers", "core.rag", "core.rag.file_loader", "services", "models", "configs", "extensions", "extensions.storage"]
+
 [dependency-groups]
 dev = [
     "pytest>=9.0.2",

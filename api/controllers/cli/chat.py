@@ -11,11 +11,9 @@ from rich.prompt import Prompt
 
 from services.chat_service import ChatService
 
-app = typer.Typer(help="Interactive CLI chat with LLM")
 console = Console()
 
 
-@app.command()
 def chat(
     model: Optional[str] = typer.Option(
         None,
@@ -29,12 +27,6 @@ def chat(
         help="Enable streaming output (default: True)",
     ),
 ):
-    """
-    Start an interactive chat session with the LLM.
-
-    Type your messages and press Enter. Type 'exit', 'quit', or press Ctrl+C to quit.
-    Type 'clear' to reset conversation history.
-    """
     console.print(
         Panel.fit(
             "[bold cyan]SaRa CLI Chat[/bold cyan]\n"
@@ -120,7 +112,6 @@ async def _handle_non_streaming_response(
         console.print(f"[red]Error: {exc}[/red]")
 
 
-@app.command()
 def once(
     message: str = typer.Argument(..., help="Message to send to the LLM"),
     model: Optional[str] = typer.Option(
@@ -135,12 +126,6 @@ def once(
         help="Enable streaming output (default: False for one-shot)",
     ),
 ):
-    """
-    Send a single message to the LLM and print the response.
-
-    Example:
-        uv run python -m controllers.cli.chat once "What is 2+2?"
-    """
     messages = [{"role": "user", "content": message}]
 
     if stream:
@@ -179,6 +164,3 @@ async def _once_non_streaming(messages: list[dict[str, str]], model: Optional[st
         console.print(f"[red]Error: {exc}[/red]")
         raise typer.Exit(code=1)
 
-
-if __name__ == "__main__":
-    app()
