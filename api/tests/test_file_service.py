@@ -46,9 +46,7 @@ def test_local_storage_save(temp_storage_dir):
     assert saved_content == content
 
 
-@patch("services.file_service.db.session.add")
-@patch("services.file_service.db.session.commit")
-def test_file_service_upload(mock_commit, mock_add, temp_storage_dir):
+def test_file_service_upload(temp_storage_dir):
     """Test the FileService upload logic."""
     from extensions.ext_storage import storage
 
@@ -60,9 +58,16 @@ def test_file_service_upload(mock_commit, mock_add, temp_storage_dir):
         content = f.read()
 
     # Call the service
-    FileService.upload_file(
+    result = FileService.upload_file(
         filename="test_save.txt", content=content, user_id="test_user"
     )
+
+    # Verify the result dictionary
+    assert "file_uuid" in result
+    assert "file_key" in result
+    assert result["filename"] == "test_save.txt"
+    assert result["extension"] == "txt"
+    assert result["size"] == len(content)
 
     # Verify the file was saved to our temp directory
     upload_files_dir = os.path.join(temp_storage_dir, "upload_files")
@@ -71,10 +76,6 @@ def test_file_service_upload(mock_commit, mock_add, temp_storage_dir):
     saved_files = os.listdir(upload_files_dir)
     assert len(saved_files) == 1
     assert saved_files[0].endswith(".txt")
-
-    # Verify DB calls
-    mock_add.assert_called_once()
-    mock_commit.assert_called_once()
 
     # Verify the content
     with open(os.path.join(upload_files_dir, saved_files[0]), "rb") as f:

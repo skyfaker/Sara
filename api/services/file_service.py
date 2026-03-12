@@ -29,14 +29,14 @@ class FileService:
     def upload_file(*,
                     filename: str,
                     content: bytes,
-                    user_id):
+                    user_id) -> dict:
         """
         Upload a file to the database.
 
         :param filename: Name of the file
         :param content: Content of the file as bytes
         :param user_id: User uploading the file
-        :return: The uploaded file record
+        :return: Dictionary with file metadata (file_uuid, file_key, filename, extension, size)
         """
         # check if filename contains invalid characters
         if any(c in filename for c in ["/", "\\", ":", "*", "?", '"', "<", ">", "|"]):
@@ -59,23 +59,14 @@ class FileService:
         # generate file key
         file_uuid = str(uuid.uuid4())
 
-        # save file to storage
         file_key = "upload_files/" + file_uuid + "." + extension
         storage.save(file_key, content)
         logging.debug("file {} saved to storage with key {}".format(filename, file_key))
 
-        # save file to db
-        upload_file = UploadFile(
-            storage_type=app_config.STORAGE_TYPE,
-            key=file_key,
-            name=filename,
-            size=file_size,
-            extension=extension,
-            created_by=user_id,
-            created_at=datetime.datetime.now(datetime.UTC).replace(tzinfo=None),
-            used=False,
-            hash=hashlib.sha3_256(content).hexdigest(),
-        )
-
-        db.session.add(upload_file)
-        db.session.commit()
+        return {
+            "file_uuid": file_uuid,
+            "file_key": file_key,
+            "filename": filename,
+            "extension": extension,
+            "size": file_size,
+        }

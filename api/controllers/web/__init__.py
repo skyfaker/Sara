@@ -15,11 +15,13 @@ def add_resource():
     from .hello import HelloWorld
     from .chat import Chat
     from .file import UploadFile
+    from .rag import RAGQuery
 
     web_api = Api(web_bp)
     web_api.add_resource(HelloWorld, "/hello")
     web_api.add_resource(Chat, "/chat")
     web_api.add_resource(UploadFile, "/upload_file")
+    web_api.add_resource(RAGQuery, "/rag/query")
 
 
 add_resource()
