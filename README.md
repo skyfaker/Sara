@@ -287,7 +287,7 @@ sara ask "什么是治安管理?" --show-sources
 sara ask "处罚流程是怎样的?" --top-k 5 --show-sources
 ```
 
-**删除事例**
+**交互示例**
 ```
 > sara ask "治安管理工作有哪个部门负责"
 >
