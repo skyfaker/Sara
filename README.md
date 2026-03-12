@@ -287,6 +287,22 @@ sara ask "什么是治安管理?" --show-sources
 sara ask "处罚流程是怎样的?" --top-k 5 --show-sources
 ```
 
+**删除事例**
+```
+> sara ask "治安管理工作有哪个部门负责"
+>
+2026-03-12 18:34:08.930 | INFO     | core.rag.retriever:retrieve:74 - Retrieving documents for query: 治安管理工作有那个部门负责...
+2026-03-12 18:34:08.930 | INFO     | core.rag.retriever:retrieve:82 - Found 1 indexed documents
+2026-03-12 18:34:08.931 | INFO     | core.providers.litellm_provider:chat:124 - LiteLLMProvider.chat called with model: hosted_vllm/MiniMax-M2.5
+⠙ Retrieving documents...2026-03-12 18:34:13.211 | INFO     | core.rag.retriever:retrieve:91 - Found 1 relevant documents above threshold 0.6
+2026-03-12 18:34:13.211 | INFO     | core.rag.retriever:retrieve:107 - Retrieved 1 document chunks
+2026-03-12 18:34:13.213 | INFO     | core.providers.litellm_provider:chat:124 - LiteLLMProvider.chat called with model: hosted_vllm/MiniMax-M2.5
+根据文档内容，治安管理工作的主管部门如下：
+第七条　主管部门
+• 全国范围：国务院公安部门负责全国的治安管理工作
+ • 地方范围：县级以上地方各级人民政府公安机关负责本行政区域内的治安管理工作
+ 此外，治安案件的管辖由国务院公安部门规定。
+```
 ---
 
 ## Web API接口
