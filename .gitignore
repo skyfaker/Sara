@@ -22,6 +22,7 @@ AGENTS.md
 
 # Virtual environments
 .venv
+.env
 
 # Distribution / packaging
 .Python
