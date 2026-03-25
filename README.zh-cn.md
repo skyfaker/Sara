@@ -1,5 +1,5 @@
 [English](README.md)
-# SaRa - RAG知识库问答系统
+# SaRa - Super agent with rag
 
 一个基于Flask + LLM的智能文档问答系统，支持DOCX文档上传、智能索引和基于检索增强生成(RAG)的问答。
 

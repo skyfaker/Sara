@@ -16,6 +16,10 @@ api/.idea
 .idea/
 .vscode
 
+# agent files
+.sisyphus/
+AGENTS.md
+
 # Virtual environments
 .venv
 
@@ -39,4 +43,9 @@ share/python-wheels/
 .installed.cfg
 *.egg
 MANIFEST
-AGENTS.md
+
+# web packages
+web/node_modules/
+web/build/
+web/guidelines/
+web/.env

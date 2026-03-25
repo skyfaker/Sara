@@ -102,6 +102,7 @@ sara/api/
 ### Install Dependencies
 
 ```bash
+git clone https://github.com/skyfaker/Sara/tree/master
 cd api
 uv sync
 ```
