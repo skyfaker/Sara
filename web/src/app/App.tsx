@@ -7,22 +7,7 @@ import { ChatInput } from './components/ChatInput';
 
 export default function App() {
   const [activeView, setActiveView] = useState('chat');
-  const [messages, setMessages] = useState<Message[]>([
-    {
-      id: '1',
-      role: 'user',
-      content: `Can you explain the concept of "Intelligent Monoliths" in software architecture and how it contrasts with microservices in terms of maintainability?`,
-      timestamp: 'You • 10:24 AM',
-    },
-    {
-      id: '2',
-      role: 'assistant',
-      content: '',
-      timestamp: '',
-      hasImage: true,
-      model: 'deepseek-chat',
-    },
-  ]);
+  const [messages, setMessages] = useState<Message[]>([]);
   const [isLoading, setIsLoading] = useState(false);
   const [showWelcome, setShowWelcome] = useState(false);
   const scrollRef = useRef<HTMLDivElement>(null);
@@ -49,7 +34,7 @@ export default function App() {
     handleSendMessage(message);
   };
 
-  const handleSendMessage = (content: string) => {
+  const handleSendMessage = async (content: string) => {
     const userMessage: Message = {
       id: Date.now().toString(),
       role: 'user',
@@ -60,19 +45,73 @@ export default function App() {
     setMessages((prev) => [...prev, userMessage]);
     setIsLoading(true);
 
-    // Simulate AI response
-    setTimeout(() => {
+    try {
+      const allMessages = [...messages, userMessage];
+      const res = await fetch('/api/chat', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          messages: allMessages.map((m) => ({ role: m.role, content: m.content })),
+          stream: true,
+        }),
+      });
+
+      if (!res.ok) {
+        const errData = await res.json().catch(() => null);
+        throw new Error(errData?.message || `Request failed (${res.status})`);
+      }
+
+      const assistantId = (Date.now() + 1).toString();
       const assistantMessage: Message = {
-        id: (Date.now() + 1).toString(),
+        id: assistantId,
         role: 'assistant',
         content: '',
-        timestamp: '',
-        hasImage: Math.random() > 0.5,
-        model: 'deepseek-chat',
+        timestamp: `Assistant • ${new Date().toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit' })}`,
+        model: '',
       };
       setMessages((prev) => [...prev, assistantMessage]);
+
+      const reader = res.body!.getReader();
+      const decoder = new TextDecoder();
+      let buffer = '';
+
+      while (true) {
+        const { done, value } = await reader.read();
+        if (done) break;
+
+        buffer += decoder.decode(value, { stream: true });
+        const lines = buffer.split('\n');
+        buffer = lines.pop() || '';
+
+        for (const line of lines) {
+          const trimmed = line.trim();
+          if (!trimmed.startsWith('data: ')) continue;
+          try {
+            const payload = JSON.parse(trimmed.slice(6));
+            if (payload.done) break;
+            if (payload.content) {
+              setMessages((prev) =>
+                prev.map((m) =>
+                  m.id === assistantId ? { ...m, content: m.content + payload.content } : m,
+                ),
+              );
+            }
+          } catch {
+            // skip malformed SSE lines
+          }
+        }
+      }
+    } catch (err) {
+      const errorMessage: Message = {
+        id: (Date.now() + 1).toString(),
+        role: 'assistant',
+        content: `Error: ${err instanceof Error ? err.message : 'Something went wrong'}`,
+        timestamp: `System • ${new Date().toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit' })}`,
+      };
+      setMessages((prev) => [...prev, errorMessage]);
+    } finally {
       setIsLoading(false);
-    }, 2000);
+    }
   };
 
   return (

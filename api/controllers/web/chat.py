@@ -31,8 +31,11 @@ class Chat(Resource):
     @validate()
     def post(self, body: ChatRequest):
         messages = [m.model_dump() for m in body.messages]
-
+        logging.info(
+            f"Received chat request with {len(messages)} messages, model: {body.model}, stream: {body.stream}"
+        )
         if body.stream:
+
             def sync_stream_wrapper():
                 loop = asyncio.new_event_loop()
                 asyncio.set_event_loop(loop)
@@ -62,8 +65,11 @@ class Chat(Resource):
             logging.error("Chat error: %s", exc)
             return {"status": 500, "message": str(exc)}, 500
 
-        return ChatResponseBody(
-            content=content,
-            model=body.model or "",
-            status=200,
-        ).model_dump(), 200
+        return (
+            ChatResponseBody(
+                content=content,
+                model=body.model or "",
+                status=200,
+            ).model_dump(),
+            200,
+        )
